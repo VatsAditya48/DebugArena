@@ -1,19 +1,24 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from app.core.config import settings
+from app.core.database import get_db
 
 
-# Create the main FastAPI application
+# Create the FastAPI application
 app = FastAPI(
     title=settings.app_name,
-    description="Backend API for the DebugArena technical assessment platform",
+    description="Backend API for the DebugArena assessment platform",
     version=settings.app_version,
 )
 
 
-# Configure Cross-Origin Resource Sharing
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -33,7 +38,7 @@ def home():
     }
 
 
-# Health-check endpoint
+# Application health check
 @app.get("/health")
 def health_check():
     return {
@@ -41,3 +46,21 @@ def health_check():
         "application": settings.app_name,
         "environment": settings.environment,
     }
+
+
+# Database health check
+@app.get("/health/database")
+def database_health(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+
+        return {
+            "status": "healthy",
+            "database": "connected",
+        }
+
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=503,
+            detail="Database connection unavailable",
+        )

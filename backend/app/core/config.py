@@ -15,12 +15,15 @@ class Settings(BaseSettings):
         env_file=BACKEND_DIR / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
+        
     )
 
     # Application information
     app_name: str = "DebugArena API"
     app_version: str = "0.1.0"
     environment: str = "development"
+    database_url: str
+    cors_origins: str = "http://localhost:5173"
 
     # Frontend URLs allowed to communicate with the backend
     cors_origins: str = "http://localhost:5173"
