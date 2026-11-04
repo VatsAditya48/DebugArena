@@ -1,22 +1,23 @@
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI
+from app.core.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
-
-from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
-
+from app.core.logging_config import configure_logging
 from app.core.config import settings
-from app.core.database import get_db
+from app.api.v1.router import api_router
 
+logger = configure_logging(settings.environment)
 
+logger.info("DebugArena logging initialized")
 # Create the FastAPI application
 app = FastAPI(
     title=settings.app_name,
-    description="Backend API for the DebugArena assessment platform",
+    description="Backend API for the DebugArena technical assessment platform",
     version=settings.app_version,
 )
 
+# Register centralized exception handlers
+register_exception_handlers(app)
 
 # Configure CORS
 app.add_middleware(
@@ -38,29 +39,8 @@ def home():
     }
 
 
-# Application health check
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "application": settings.app_name,
-        "environment": settings.environment,
-    }
-
-
-# Database health check
-@app.get("/health/database")
-def database_health(db: Session = Depends(get_db)):
-    try:
-        db.execute(text("SELECT 1"))
-
-        return {
-            "status": "healthy",
-            "database": "connected",
-        }
-
-    except SQLAlchemyError:
-        raise HTTPException(
-            status_code=503,
-            detail="Database connection unavailable",
-        )
+# Register version 1 API routes
+app.include_router(
+    api_router,
+    prefix="/api/v1",
+)
