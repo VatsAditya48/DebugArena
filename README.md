@@ -17,7 +17,7 @@ DebugArena is a technical assessment platform where recruiters evaluate candidat
 ## Team Members
 
 1. Aditya
-2. Shristi
+2. Srishti
 3. Vaishnavi
 4. Vishu
 5. Abhay
