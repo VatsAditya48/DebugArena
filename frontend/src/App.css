@@ -306,3 +306,123 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* CREATE ASSESSMENT FORM */
+
+.create-form {
+  width: 100%;
+  max-width: 1000px;
+  margin: 32px auto;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.create-form-heading {
+  margin-bottom: 28px;
+}
+
+.create-form-heading h3 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.create-form-heading p {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.create-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.create-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.create-form .form-group label {
+  display: block;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.create-form .form-group input,
+.create-form .form-group select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  border: 1px solid #303647;
+  border-radius: 8px;
+  background: #0f1420;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+}
+
+.create-form .form-group input:focus,
+.create-form .form-group select:focus {
+  border-color: #8b5cf6;
+}
+
+.create-form .form-group input::placeholder {
+  color: #64748b;
+}
+
+.create-form .form-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.create-form .form-actions button {
+  min-height: 46px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: #8b5cf6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.create-form .form-actions button:hover {
+  background: #7c3aed;
+}
+
+.create-form .form-actions .cancel-btn {
+  background: #252b3b;
+  border: 1px solid #3b4255;
+}
+
+.create-form .form-actions .cancel-btn:hover {
+  background: #353d50;
+}
+
+@media (max-width: 650px) {
+  .create-form {
+    padding: 20px;
+  }
+
+  .create-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .create-form .form-actions {
+    flex-direction: column;
+  }
+
+  .create-form .form-actions button {
+    width: 100%;
+  }
+}
