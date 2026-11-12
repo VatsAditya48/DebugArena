@@ -2,13 +2,24 @@
 import { useState } from "react";
 import "../App.css";
 
+interface Submission {
+  id: number;
+  candidate: string;
+  assessment: string;
+  date: string;
+  score: string;
+  status: "Passed" | "Failed" | "Pending";
+}
+
 function Submissions() {
   const [showAll, setShowAll] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  const submissions = [
+  // Demo data. Real submission records will come from the backend API.
+  const submissions: Submission[] = [
     {
+      id: 1,
       candidate: "Rahul Sharma",
       assessment: "Python Debugging Challenge",
       date: "10 Nov 2026",
@@ -16,6 +27,7 @@ function Submissions() {
       status: "Passed",
     },
     {
+      id: 2,
       candidate: "Priya Verma",
       assessment: "Data Structures & Algorithms",
       date: "09 Nov 2026",
@@ -23,6 +35,7 @@ function Submissions() {
       status: "Passed",
     },
     {
+      id: 3,
       candidate: "Aman Gupta",
       assessment: "Java Code Evaluation",
       date: "08 Nov 2026",
@@ -32,14 +45,22 @@ function Submissions() {
   ];
 
   const total = submissions.length;
-  const passed = submissions.filter(s => s.status === "Passed").length;
-  const failed = submissions.filter(s => s.status === "Failed").length;
-  const pending = submissions.filter(s => s.status === "Pending").length;
+  const passed = submissions.filter(
+    (submission) => submission.status === "Passed"
+  ).length;
+  const failed = submissions.filter(
+    (submission) => submission.status === "Failed"
+  ).length;
+  const pending = submissions.filter(
+    (submission) => submission.status === "Pending"
+  ).length;
 
   const filteredSubmissions = submissions.filter((submission) => {
+    const searchTerm = search.toLowerCase().trim();
+
     const matchesSearch =
-      submission.candidate.toLowerCase().includes(search.toLowerCase()) ||
-      submission.assessment.toLowerCase().includes(search.toLowerCase());
+      submission.candidate.toLowerCase().includes(searchTerm) ||
+      submission.assessment.toLowerCase().includes(searchTerm);
 
     const matchesFilter =
       filter === "All" || submission.status === filter;
@@ -51,19 +72,21 @@ function Submissions() {
     ? filteredSubmissions
     : submissions.slice(0, 2);
 
+  const handleViewToggle = () => {
+    setShowAll((previous) => !previous);
+    setSearch("");
+    setFilter("All");
+  };
+
   return (
-    <div className="main">
+    <>
       <header className="topbar">
         <div>
           <p className="breadcrumb">Workspace / Submissions</p>
           <h2>Submissions</h2>
         </div>
 
-        <button onClick={() => {
-          setShowAll(!showAll);
-          setSearch("");
-          setFilter("All");
-        }}>
+        <button type="button" onClick={handleViewToggle}>
           {showAll ? "View Recent Submissions" : "View All Submissions"}
         </button>
       </header>
@@ -99,17 +122,20 @@ function Submissions() {
         </div>
 
         {showAll && (
-          <div style={{
-            display: "flex",
-            gap: "12px",
-            margin: "20px 0",
-            flexWrap: "wrap"
-          }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              margin: "20px 0",
+              flexWrap: "wrap",
+            }}
+          >
             <input
-              type="text"
+              type="search"
               placeholder="Search candidate or assessment..."
+              aria-label="Search candidate or assessment"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(event) => setSearch(event.target.value)}
               style={{
                 flex: "1",
                 minWidth: "200px",
@@ -117,19 +143,20 @@ function Submissions() {
                 borderRadius: "8px",
                 background: "#101522",
                 color: "white",
-                border: "1px solid #303747"
+                border: "1px solid #303747",
               }}
             />
 
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(event) => setFilter(event.target.value)}
+              aria-label="Filter submissions by status"
               style={{
                 padding: "12px",
                 borderRadius: "8px",
                 background: "#101522",
                 color: "white",
-                border: "1px solid #303747"
+                border: "1px solid #303747",
               }}
             >
               <option value="All">All Statuses</option>
@@ -141,8 +168,8 @@ function Submissions() {
         )}
 
         {displayedSubmissions.length > 0 ? (
-          displayedSubmissions.map((submission, index) => (
-            <div className="assessment" key={index}>
+          displayedSubmissions.map((submission) => (
+            <div className="assessment" key={submission.id}>
               <div>
                 <h4>{submission.candidate}</h4>
                 <p>
@@ -155,7 +182,9 @@ function Submissions() {
                 className={`status ${
                   submission.status === "Passed"
                     ? "active-status"
-                    : "draft"
+                    : submission.status === "Failed"
+                    ? "draft"
+                    : "pending-status"
                 }`}
               >
                 {submission.status}
@@ -163,16 +192,19 @@ function Submissions() {
             </div>
           ))
         ) : (
-          <p style={{
-            padding: "25px",
-            textAlign: "center",
-            color: "#94a3b8"
-          }}>
+          <p
+            style={{
+              padding: "25px",
+              textAlign: "center",
+              color: "#94a3b8",
+            }}
+            role="status"
+          >
             No submissions found.
           </p>
         )}
       </section>
-    </div>
+    </>
   );
 }
 

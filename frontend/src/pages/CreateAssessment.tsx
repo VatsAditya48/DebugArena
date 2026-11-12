@@ -1,6 +1,9 @@
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import Input from "../components/Input";
+import Button from "../components/Button";
 import "../App.css";
 
 function CreateAssessment() {
@@ -12,7 +15,7 @@ function CreateAssessment() {
   const [duration, setDuration] = useState("30");
   const [questions, setQuestions] = useState("10");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const assessment = {
@@ -57,20 +60,14 @@ function CreateAssessment() {
 
         <form onSubmit={handleSubmit}>
           <div className="create-form-grid">
-
-            <div className="form-group">
-              <label htmlFor="assessment-title">
-                Assessment Title
-              </label>
-              <input
-                id="assessment-title"
-                type="text"
-                placeholder="e.g. Python Debugging Challenge"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
+            <Input
+              label="Assessment Title"
+              type="text"
+              placeholder="e.g. Python Debugging Challenge"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
 
             <div className="form-group">
               <label htmlFor="language">
@@ -103,48 +100,38 @@ function CreateAssessment() {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="duration">
-                Duration (minutes)
-              </label>
-              <input
-                id="duration"
-                type="number"
-                min="5"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                required
-              />
-            </div>
+            <Input
+              label="Duration (minutes)"
+              type="number"
+              min="5"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              required
+            />
 
-            <div className="form-group">
-              <label htmlFor="questions">
-                Number of Questions
-              </label>
-              <input
-                id="questions"
-                type="number"
-                min="1"
-                value={questions}
-                onChange={(e) => setQuestions(e.target.value)}
-                required
-              />
-            </div>
-
+            <Input
+              label="Number of Questions"
+              type="number"
+              min="1"
+              value={questions}
+              onChange={(e) => setQuestions(e.target.value)}
+              required
+            />
           </div>
 
           <div className="form-actions">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               className="cancel-btn"
               onClick={() => navigate("/assessments")}
             >
               Cancel
-            </button>
+            </Button>
 
-            <button type="submit">
+            <Button type="submit" variant="primary">
               + Create Assessment
-            </button>
+            </Button>
           </div>
         </form>
       </section>

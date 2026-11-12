@@ -1,9 +1,20 @@
 
 import "../App.css";
 
+interface AssessmentReport {
+  id: number;
+  title: string;
+  candidates: number;
+  average: string;
+  passed: number;
+  failed: number;
+}
+
 function Reports() {
-  const reports = [
+  // Demo data. Real analytics will be supplied by the backend API.
+  const reports: AssessmentReport[] = [
     {
+      id: 1,
       title: "Python Debugging Challenge",
       candidates: 45,
       average: "86%",
@@ -11,6 +22,7 @@ function Reports() {
       failed: 7,
     },
     {
+      id: 2,
       title: "Data Structures & Algorithms",
       candidates: 32,
       average: "78%",
@@ -18,6 +30,7 @@ function Reports() {
       failed: 7,
     },
     {
+      id: 3,
       title: "Java Code Evaluation",
       candidates: 28,
       average: "65%",
@@ -27,53 +40,79 @@ function Reports() {
   ];
 
   const totalCandidates = reports.reduce(
-    (sum, report) => sum + report.candidates, 0
+    (sum, report) => sum + report.candidates,
+    0
   );
 
   const totalPassed = reports.reduce(
-    (sum, report) => sum + report.passed, 0
+    (sum, report) => sum + report.passed,
+    0
   );
 
   const totalFailed = reports.reduce(
-    (sum, report) => sum + report.failed, 0
+    (sum, report) => sum + report.failed,
+    0
   );
 
-  const averageScore = Math.round(
-    reports.reduce(
-      (sum, report) =>
-        sum + parseInt(report.average) * report.candidates, 0
-    ) / totalCandidates
-  );
+  const averageScore =
+    totalCandidates > 0
+      ? Math.round(
+          reports.reduce(
+            (sum, report) =>
+              sum + Number.parseInt(report.average, 10) * report.candidates,
+            0
+          ) / totalCandidates
+        )
+      : 0;
 
   const downloadReport = () => {
     const content = [
       ["Assessment", "Candidates", "Average Score", "Passed", "Failed"],
-      ...reports.map(r => [
-        r.title, r.candidates, r.average, r.passed, r.failed
-      ])
+      ...reports.map((report) => [
+        report.title,
+        report.candidates,
+        report.average,
+        report.passed,
+        report.failed,
+      ]),
     ];
 
-    const csv = content.map(row => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
+    // Escape CSV values so commas and quotation marks are handled correctly.
+    const csv = content
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\r\n");
 
+    // Add a BOM to improve compatibility with spreadsheet applications.
+    const blob = new Blob(["\uFEFF", csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+
     link.href = url;
     link.download = "DebugArena_Report.csv";
-    link.click();
 
-    URL.revokeObjectURL(url);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   return (
-    <div className="main">
+    <>
       <header className="topbar">
         <div>
           <p className="breadcrumb">Workspace / Reports</p>
           <h2>Reports & Analytics</h2>
         </div>
 
-        <button onClick={downloadReport}>
+        <button type="button" onClick={downloadReport}>
           Download Report
         </button>
       </header>
@@ -106,27 +145,44 @@ function Reports() {
           <span>Performance across all assessments</span>
         </div>
 
-        {reports.map((report, index) => (
-          <div className="assessment" key={index}>
-            <div>
-              <h4>{report.title}</h4>
-              <p>
-                {report.candidates} candidates ·
-                Average Score: {report.average}
-              </p>
-              <p>
-                Passed: {report.passed} ·
-                Failed: {report.failed}
-              </p>
-            </div>
+        {reports.length > 0 ? (
+          reports.map((report) => (
+            <div className="assessment" key={report.id}>
+              <div>
+                <h4>{report.title}</h4>
 
-            <span className="status active-status">
-              {report.average}
-            </span>
-          </div>
-        ))}
+                <p>
+                  {report.candidates} candidates · Average Score:{" "}
+                  {report.average}
+                </p>
+
+                <p>
+                  Passed: {report.passed} · Failed: {report.failed}
+                </p>
+              </div>
+
+              <span className="status active-status">
+                {report.average}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p role="status" style={{ padding: "20px", color: "#94a3b8" }}>
+            No assessment reports are available yet.
+          </p>
+        )}
       </section>
-    </div>
+
+      <p
+        style={{
+          marginTop: "16px",
+          color: "#94a3b8",
+          fontSize: "13px",
+        }}
+      >
+        Demo analytics: figures are sample data until backend integration.
+      </p>
+    </>
   );
 }
 

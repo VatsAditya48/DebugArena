@@ -1,7 +1,14 @@
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("debugarena_user");
+    navigate("/login", { replace: true });
+  };
+
   return (
     <aside className="sidebar">
       <h2 className="logo">
@@ -34,11 +41,20 @@ function Sidebar() {
 
       <div className="sidebar-bottom">
         <NavLink to="/settings">
-        ⚙ Settings
+          ⚙ Settings
         </NavLink>
+
         <NavLink to="/help">
-        ⓘ Help & Support
+          ⓘ Help & Support
         </NavLink>
+
+        <button
+          type="button"
+          className="sidebar-logout"
+          onClick={handleLogout}
+        >
+          ↪ Logout
+        </button>
       </div>
     </aside>
   );

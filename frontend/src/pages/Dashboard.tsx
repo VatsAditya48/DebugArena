@@ -1,7 +1,10 @@
 
+import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 
 function Dashboard() {
+  const navigate = useNavigate();
+
   return (
     <>
       <header className="topbar">
@@ -23,7 +26,9 @@ function Dashboard() {
           <p>Evaluate skills. Identify talent. Hire with confidence.</p>
         </div>
 
-        <button>+ Create Assessment</button>
+        <button onClick={() => navigate("/create-assessment")}>
+          + Create Assessment
+        </button>
       </section>
 
       <section className="stats">
@@ -56,7 +61,8 @@ function Dashboard() {
         <div className="panel">
           <div className="panel-heading">
             <h3>Recent Assessments</h3>
-            <a>View all →</a>
+
+            <Link to="/assessments">View all →</Link>
           </div>
 
           <div className="assessment">
@@ -64,7 +70,6 @@ function Dashboard() {
               <h4>Python Debugging Challenge</h4>
               <p>Software Engineering · 45 minutes</p>
             </div>
-
             <span className="status active-status">Active</span>
           </div>
 
@@ -73,7 +78,6 @@ function Dashboard() {
               <h4>Data Structures & Algorithms</h4>
               <p>Technical Screening · 60 minutes</p>
             </div>
-
             <span className="status completed">Completed</span>
           </div>
 
@@ -82,7 +86,6 @@ function Dashboard() {
               <h4>Java Code Evaluation</h4>
               <p>Backend Development · 30 minutes</p>
             </div>
-
             <span className="status draft">Draft</span>
           </div>
         </div>
