@@ -1,50 +1,48 @@
 import re
 import uuid
-from pydantic import BaseModel, Field, field_validator
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class UserRegister(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     email: str = Field(..., description="Valid email address")
-    password: str = Field(..., min_length=6, description="Password must be at least 6 characters")
-    full_name: str = Field(..., min_length=2, max_length=150, description="Full Name")
-    role: str = Field(default="candidate", description="Role: 'candidate', 'recruiter', or 'admin'")
-    organization_id: uuid.UUID | None = Field(default=None, description="Optional Organization UUID")
+    password: str = Field(..., min_length=8)
+    full_name: str = Field(..., min_length=2, max_length=150)
 
     @field_validator("email")
     @classmethod
-    def validate_email(cls, v: str) -> str:
-        v = v.strip().lower()
+    def validate_email(cls, value: str) -> str:
+        value = value.strip().lower()
         email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-        if not re.match(email_regex, v):
-            raise ValueError("Invalid email format (e.g. user@example.com)")
-        return v
+        if not re.match(email_regex, value):
+            raise ValueError("Invalid email format")
+        return value
 
     @field_validator("password")
     @classmethod
-    def validate_password(cls, v: str) -> str:
-        v = v.strip()
-        if len(v) < 6:
-            raise ValueError("Password must be at least 6 characters long")
-        return v
+    def validate_password(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        if len(value.encode("utf-8")) > 72:
+            raise ValueError("Password must not exceed 72 UTF-8 bytes")
+        return value
 
-    @field_validator("role")
+    @field_validator("full_name")
     @classmethod
-    def validate_role(cls, v: str) -> str:
-        v = v.strip().lower()
-        allowed_roles = ["candidate", "recruiter", "admin"]
-        if v not in allowed_roles:
-            raise ValueError(f"Role must be one of: {allowed_roles}")
-        return v
+    def validate_full_name(cls, value: str) -> str:
+        return value.strip()
 
 
 class UserLogin(BaseModel):
-    email: str = Field(..., description="Registered email address")
-    password: str = Field(..., description="Password")
+    email: str
+    password: str
 
     @field_validator("email")
     @classmethod
-    def validate_email(cls, v: str) -> str:
-        return v.strip().lower()
+    def validate_email(cls, value: str) -> str:
+        return value.strip().lower()
 
 
 class UserResponse(BaseModel):
@@ -54,8 +52,7 @@ class UserResponse(BaseModel):
     is_active: bool
     role: str = "candidate"
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenResponse(BaseModel):
