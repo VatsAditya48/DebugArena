@@ -1,17 +1,19 @@
 
 import { NavLink, useNavigate } from "react-router-dom";
+import { clearAuthUser } from "../services/auth";
+
 
 function Sidebar() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("debugarena_user");
-    navigate("/login", { replace: true });
-  };
+ const handleLogout = () => {
+  clearAuthUser();
+  navigate("/login", { replace: true });
+};
 
   return (
     <aside className="sidebar">
-      <h2 className="logo">
+      <h2 className="logo"> 
         Debug<span>Arena</span>
       </h2>
 

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
+import { saveAuthUser } from "../services/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -21,10 +22,10 @@ function Login() {
 
     // Temporary frontend demonstration only.
     // Real authentication will be connected to Shairaf's API.
-    localStorage.setItem("debugarena_user", JSON.stringify({
-      email,
-      role: "recruiter",
-    }));
+    saveAuthUser({
+  email,
+  role: "recruiter",
+});
 
     navigate("/");
   };
