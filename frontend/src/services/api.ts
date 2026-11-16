@@ -1,7 +1,10 @@
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://127.0.0.1:8000/api/v1"
+).replace(/\/$/, "");
 
+export const ACCESS_TOKEN_KEY = "debugarena_access_token";
 export class ApiError extends Error {
   status: number;
 
@@ -22,6 +25,16 @@ export async function apiRequest<T>(
     headers.set("Content-Type", "application/json");
   }
 
+  // Automatically attach the JWT to protected API requests.
+  const token =
+    typeof window !== "undefined"
+      ? window.sessionStorage.getItem(ACCESS_TOKEN_KEY)
+      : null;
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
@@ -32,9 +45,16 @@ export async function apiRequest<T>(
 
     try {
       const errorData = await response.json();
-      message = errorData.detail || message;
+
+      if (typeof errorData.detail === "string") {
+        message = errorData.detail;
+      } else if (typeof errorData.message === "string") {
+        message = errorData.message;
+      } else if (typeof errorData.error?.message === "string") {
+        message = errorData.error.message;
+      }
     } catch {
-      // Keep the default error message.
+      // Keep the fallback message if the response is not JSON.
     }
 
     throw new ApiError(message, response.status);
