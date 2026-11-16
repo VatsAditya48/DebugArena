@@ -6,6 +6,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
+import { getAuthUser } from "../services/auth";
 
 import Dashboard from "../pages/Dashboard";
 import Assessments from "../pages/Assessments";
@@ -23,7 +24,7 @@ import CandidateLayout from "../layouts/CandidateLayout";
 import RecruiterLayout from "../layouts/RecruiterLayout";
 
 function ProtectedRoute() {
-  const user = localStorage.getItem("debugarena_user");
+  const user = getAuthUser();
 
   return user ? <Outlet /> : <Navigate to="/login" replace />;
 }

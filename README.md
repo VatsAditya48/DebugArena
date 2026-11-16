@@ -21,7 +21,7 @@ DebugArena is a technical assessment platform where recruiters evaluate candidat
 3. Vaishnavi
 4. Vishu
 5. Abhay
-6. Shairraf
+6. Shairaf
 
 ## Git Workflow
 
