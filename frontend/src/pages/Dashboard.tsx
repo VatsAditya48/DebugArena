@@ -1,9 +1,24 @@
-
+import { useEffect, useState } from "react";
+import { checkBackendHealth } from "../services/health";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        await checkBackendHealth();
+        setIsBackendHealthy(true);
+      } catch (error) {
+        setIsBackendHealthy(false);
+      }
+    };
+
+    checkHealth();
+  }, []);
 
   return (
     <>
@@ -29,6 +44,19 @@ function Dashboard() {
         <button onClick={() => navigate("/create-assessment")}>
           + Create Assessment
         </button>
+      </section>
+            <section className="panel">
+        <h3>Backend Connection</h3>
+
+        {isBackendHealthy === null && <p>Checking connection...</p>}
+
+        {isBackendHealthy === true && (
+          <p>🟢 Backend connected successfully</p>
+        )}
+
+        {isBackendHealthy === false && (
+          <p>🔴 Backend unavailable</p>
+        )}
       </section>
 
       <section className="stats">
