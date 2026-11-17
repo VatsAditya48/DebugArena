@@ -23,9 +23,10 @@ import CandidateLayout from "../layouts/CandidateLayout";
 import RecruiterLayout from "../layouts/RecruiterLayout";
 
 function ProtectedRoute() {
+  const token = localStorage.getItem("debugarena_access_token");
   const user = localStorage.getItem("debugarena_user");
 
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return token && user ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 export default function AppRoutes() {

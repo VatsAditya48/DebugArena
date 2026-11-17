@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
+import { apiRequest } from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -9,8 +10,10 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -19,15 +22,26 @@ function Login() {
       return;
     }
 
-    // Temporary frontend demonstration only.
-    // Real authentication will be connected to Shairaf's API.
-    localStorage.setItem("debugarena_user", JSON.stringify({
-      email,
-      role: "recruiter",
-    }));
+    setLoading(true);
+    try {
+      const result = await apiRequest<{
+        access_token: string;
+        user: { id: string; email: string; full_name: string; role: string };
+      }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
-    navigate("/");
+      localStorage.setItem("debugarena_access_token", result.access_token);
+      localStorage.setItem("debugarena_user", JSON.stringify(result.user));
+      navigate("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed.");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="auth-page">
@@ -71,8 +85,8 @@ function Login() {
 
           {error && <p className="auth-error" role="alert">{error}</p>}
 
-          <button type="submit" className="auth-submit">
-            Sign In
+          <button type="submit" className="auth-submit" disabled={loading}>
+{loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 

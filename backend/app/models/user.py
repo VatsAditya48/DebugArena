@@ -43,6 +43,10 @@ class User(Base):
         nullable=False,
     )
 
+    created_assessments: Mapped[list["Assessment"]] = relationship(
+        back_populates="creator"
+    )
+
     memberships: Mapped[list["OrganizationMembership"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
