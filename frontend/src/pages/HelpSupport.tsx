@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import "../App.css";
+import { getAuthUser } from "../services/auth";
 
 interface SupportRequest {
   id: number;
@@ -12,15 +13,12 @@ interface SupportRequest {
 }
 
 function HelpSupport() {
-  const user = (() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("debugarena_user") || "{}"
-      );
-    } catch {
-      return {};
-    }
-  })();
+  const authUser = getAuthUser();
+
+  const user = {
+    name: authUser?.full_name || "",
+    email: authUser?.email || "",
+  };
 
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");

@@ -1,8 +1,7 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../App.css";
-import { apiRequest } from "../services/api";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";import "../App.css";
+import { login } from "../services/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,36 +11,24 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-
-    if (!email.trim() || !password.trim()) {
-      setError("Please enter your email and password.");
-      return;
-    }
-
     setLoading(true);
-    try {
-      const result = await apiRequest<{
-        access_token: string;
-        user: { id: string; email: string; full_name: string; role: string };
-      }>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
 
-      localStorage.setItem("debugarena_access_token", result.access_token);
-      localStorage.setItem("debugarena_user", JSON.stringify(result.user));
-      navigate("/");
+    try {
+      await login(email.trim(), password);
+      navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to sign in. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="auth-page">
@@ -65,7 +52,7 @@ function Login() {
               placeholder="you@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              autoComplete="username"
               required
             />
           </div>
@@ -83,16 +70,23 @@ function Login() {
             />
           </div>
 
-          {error && <p className="auth-error" role="alert">{error}</p>}
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button type="submit" className="auth-submit" disabled={loading}>
-{loading ? "Signing in..." : "Sign In"}
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <p className="auth-footer">
-          Don't have a recruiter account?{" "}
-          <Link to="/register">Create an account</Link>
+          Recruiter accounts are provisioned by the administrator.
         </p>
 
         <p className="auth-note">

@@ -4,7 +4,6 @@ import "../styles/CandidatePortal.css";
 export default function CandidateLayout() {
   const navigate = useNavigate();
   const logout = () => {
-    localStorage.removeItem("debugarena_user");
     navigate("/login", { replace: true });
   };
 

@@ -1,4 +1,5 @@
 
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,6 +7,11 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
+
+import {
+  getCurrentUser,
+  clearAuthUser,
+} from "../services/auth";
 
 import Dashboard from "../pages/Dashboard";
 import Assessments from "../pages/Assessments";
@@ -16,28 +22,57 @@ import Reports from "../pages/Reports";
 import Settings from "../pages/Settings";
 import HelpSupport from "../pages/HelpSupport";
 import Login from "../pages/Login";
-import Register from "../pages/Register";
 import CandidatePortal from "../pages/CandidatePortal";
 
 import CandidateLayout from "../layouts/CandidateLayout";
 import RecruiterLayout from "../layouts/RecruiterLayout";
 
 function ProtectedRoute() {
-  const token = localStorage.getItem("debugarena_access_token");
-  const user = localStorage.getItem("debugarena_user");
+  const [checking, setChecking] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
 
-  return token && user ? <Outlet /> : <Navigate to="/login" replace />;
+  useEffect(() => {
+    let active = true;
+
+    getCurrentUser()
+      .then(() => {
+        if (active) setAuthenticated(true);
+      })
+      .catch(() => {
+        clearAuthUser();
+        if (active) setAuthenticated(false);
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="auth-page">
+        <p>Verifying your session...</p>
+      </div>
+    );
+  }
+
+  return authenticated
+    ? <Outlet />
+    : <Navigate to="/login" replace />;
 }
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* Protected recruiter routes */}
+<Route
+  path="/register"
+  element={<Navigate to="/login" replace />}
+/>
         <Route element={<ProtectedRoute />}>
           <Route element={<RecruiterLayout />}>
             <Route index element={<Dashboard />} />
@@ -51,7 +86,6 @@ export default function AppRoutes() {
           </Route>
         </Route>
 
-        {/* Candidate Portal */}
         <Route
           path="/candidate"
           element={<CandidateLayout />}
@@ -59,7 +93,6 @@ export default function AppRoutes() {
           <Route index element={<CandidatePortal />} />
         </Route>
 
-        {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

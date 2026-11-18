@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import "../App.css";
+import { getAuthUser } from "../services/auth";
 
 interface UserData {
   name?: string;
@@ -14,12 +15,12 @@ interface Preferences {
 }
 
 function Settings() {
-  const [user, setUser] = useState<UserData>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("debugarena_user") || "{}");
-    } catch {
-      return {};
-    }
+  const authUser = getAuthUser();
+
+  const [user, setUser] = useState<UserData>({
+    name: authUser?.full_name || "",
+    email: authUser?.email || "",
+    role: authUser?.role || "",
   });
 
   const [fullName, setFullName] = useState(user.name || "Admin");
@@ -56,18 +57,14 @@ function Settings() {
       return;
     }
 
-    const updatedUser = {
-      ...user,
+    setUser((previous) => ({
+      ...previous,
       name: fullName.trim(),
-    };
+    }));
 
-    localStorage.setItem(
-      "debugarena_user",
-      JSON.stringify(updatedUser)
+    setSavedMessage(
+      "Display name updated for this page. Backend profile updates are not yet supported."
     );
-
-    setUser(updatedUser);
-    setSavedMessage("Profile updated successfully!");
 
     setTimeout(() => setSavedMessage(""), 3000);
   };
