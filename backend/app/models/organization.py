@@ -38,6 +38,10 @@ class Organization(Base):
         nullable=False,
     )
 
+    assessments: Mapped[list["Assessment"]] = relationship(
+        back_populates="organization"
+    )
+
     memberships: Mapped[list["OrganizationMembership"]] = relationship(
         back_populates="organization", cascade="all, delete-orphan"
     )
